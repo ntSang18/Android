@@ -8,6 +8,7 @@
         <entry key="..\:/Users/lengo/AndroidStudioProjects/github/DiDong/Chat-App/app/src/main/res/drawable/ic_baseline_exit_to_app_24.xml" value="0.18" />
         <entry key="..\:/Users/lengo/AndroidStudioProjects/github/DiDong/Chat-App/app/src/main/res/drawable/ic_baseline_save_as_24.xml" value="0.18" />
         <entry key="..\:/Users/lengo/AndroidStudioProjects/github/DiDong/Chat-App/app/src/main/res/drawable/ic_launcher_background.xml" value="0.1765" />
+        <entry key="..\:/Users/lengo/AndroidStudioProjects/github/DiDong/Chat-App/app/src/main/res/drawable/search_bar.xml" value="0.18" />
         <entry key="..\:/Users/lengo/AndroidStudioProjects/github/DiDong/Chat-App/app/src/main/res/drawable/shape_dialog.xml" value="0.1765" />
         <entry key="..\:/Users/lengo/AndroidStudioProjects/github/DiDong/Chat-App/app/src/main/res/drawable/show_password_selector.xml" value="0.177" />
         <entry key="..\:/Users/lengo/AndroidStudioProjects/github/DiDong/Chat-App/app/src/main/res/font/fonts.xml" value="0.3277777777777778" />
@@ -20,6 +21,8 @@
         <entry key="..\:/Users/lengo/AndroidStudioProjects/github/DiDong/Chat-App/app/src/main/res/layout/fragment_o_t_p.xml" value="0.34479166666666666" />
         <entry key="..\:/Users/lengo/AndroidStudioProjects/github/DiDong/Chat-App/app/src/main/res/layout/fragment_register.xml" value="0.3072289156626506" />
         <entry key="..\:/Users/lengo/AndroidStudioProjects/github/DiDong/Chat-App/app/src/main/res/layout/fragment_setting.xml" value="0.28225806451612906" />
+        <entry key="..\:/Users/lengo/AndroidStudioProjects/github/DiDong/Chat-App/app/src/main/res/layout/item_online.xml" value="0.25859375" />
+        <entry key="..\:/Users/lengo/AndroidStudioProjects/github/DiDong/Chat-App/app/src/main/res/layout/item_profile.xml" value="0.34479166666666666" />
       </map>
     </option>
   </component>
