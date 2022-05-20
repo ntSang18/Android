@@ -12,7 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 
-public class IntroFragment extends Fragment {
+public class IntroFragment extends Fragment{
 
 
 

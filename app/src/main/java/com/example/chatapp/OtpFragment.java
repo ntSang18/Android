@@ -46,6 +46,10 @@ public class OtpFragment extends Fragment {
     public static String otp_code;
     private User user;
     private String password;
+    FragmentOptBinding binding;
+
+    SharedPreferences preferences;
+    SharedPreferences.Editor ed;
 
     FirebaseAuth auth = FirebaseAuth.getInstance();
     FirebaseDatabase database = FirebaseDatabase.getInstance();
@@ -63,11 +67,21 @@ public class OtpFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        FragmentOptBinding binding = FragmentOptBinding.inflate(inflater, container, false);
+        binding = FragmentOptBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
         binding.email.setText(user.getEmail());
         binding.email.setEnabled(false);
+
+        preferences = getContext().getSharedPreferences("user.txt", Context.MODE_PRIVATE);
+        ed = preferences.edit();
+
+        setListeners();
+
+        return root;
+    }
+
+    private void setListeners(){
 
         binding.change.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -124,6 +138,9 @@ public class OtpFragment extends Fragment {
                                             public void onComplete(@NonNull Task<Void> task) {
                                                 if (task.isSuccessful()){
                                                     Navigation.findNavController(getView()).navigate(R.id.homeFragment);
+                                                    ed.putString("email", binding.email.getText().toString());
+                                                    ed.putString("password", password);
+                                                    ed.apply();
                                                 }else {
                                                     Toast.makeText(getContext(), "Error in Creating a new User", Toast.LENGTH_SHORT).show();
                                                     binding.otpView.setText("");
@@ -144,8 +161,6 @@ public class OtpFragment extends Fragment {
                 }
             }
         });
-
-        return root;
     }
 
     public static void sendMail(String recepient) {
