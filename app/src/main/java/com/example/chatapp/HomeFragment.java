@@ -21,7 +21,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
 
-public class HomeFragment extends Fragment {
+public class HomeFragment extends HandlerUser {
 
     FirebaseAuth auth = FirebaseAuth.getInstance();
     User user = new User();
@@ -41,8 +41,6 @@ public class HomeFragment extends Fragment {
         // Inflate the layout for this fragment
         FragmentHomeBinding binding = FragmentHomeBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
-
-        FirebaseAuth auth = FirebaseAuth.getInstance();
 
         if(auth.getCurrentUser() == null){
             getChildFragmentManager().beginTransaction().replace(R.id.homepage, new LoginFragment()).commit();
@@ -75,4 +73,6 @@ public class HomeFragment extends Fragment {
 
         return root;
     }
+
+
 }

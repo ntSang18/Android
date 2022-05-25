@@ -26,6 +26,8 @@ import java.io.Serializable;
 public class RegisterFragment extends Fragment {
 
     FirebaseAuth auth = FirebaseAuth.getInstance();
+    private FragmentRegisterBinding binding;
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -39,9 +41,27 @@ public class RegisterFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        FragmentRegisterBinding binding = FragmentRegisterBinding.inflate(inflater, container, false);
+        binding = FragmentRegisterBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
+
+
+
+
+
+        if(!checkValidInfo()){
+            binding.signup.setEnabled(false);
+        }
+
+        setlisteners();
+
+
+        return root;
+    }
+
+    private void setlisteners(){
+
+        //Sign In Text click
         binding.signInText.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -49,44 +69,15 @@ public class RegisterFragment extends Fragment {
             }
         });
 
-
-        binding.signup.setEnabled(false);
-
+        //event email change
         binding.email.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
 
             }
-
-
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                if (!binding.email.getText().toString().equals("") && !binding.password.getText().toString().equals("")
-                        && !binding.name.getText().toString().equals("") && !binding.rePass.getText().toString().equals("")) {
-                    binding.signup.setEnabled(true);
-                } else {
-                    binding.signup.setEnabled(false);
-                }
-
-            }
-
-            @Override
-            public void afterTextChanged(Editable editable) {
-
-            }
-        });
-
-        binding.name.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-            }
-
-
-            @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                if (!binding.email.getText().toString().equals("") && !binding.password.getText().toString().equals("")
-                        && !binding.name.getText().toString().equals("") && !binding.rePass.getText().toString().equals("")) {
+                if (checkValidInfo()) {
                     binding.signup.setEnabled(true);
                 } else {
                     binding.signup.setEnabled(false);
@@ -109,8 +100,7 @@ public class RegisterFragment extends Fragment {
 
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                if (!binding.email.getText().toString().equals("") && !binding.password.getText().toString().equals("")
-                        && !binding.name.getText().toString().equals("") && !binding.rePass.getText().toString().equals("")) {
+                if (checkValidInfo()) {
                     binding.signup.setEnabled(true);
                 } else {
                     binding.signup.setEnabled(false);
@@ -125,6 +115,7 @@ public class RegisterFragment extends Fragment {
 
         });
 
+        //event rePassword change
         binding.rePass.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -134,8 +125,7 @@ public class RegisterFragment extends Fragment {
 
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                if (!binding.email.getText().toString().equals("") && !binding.password.getText().toString().equals("")
-                        && !binding.name.getText().toString().equals("") && !binding.rePass.getText().toString().equals("")) {
+                if (checkValidInfo()) {
                     binding.signup.setEnabled(true);
                 } else {
                     binding.signup.setEnabled(false);
@@ -149,7 +139,32 @@ public class RegisterFragment extends Fragment {
             }
         });
 
+        //event name change
+        binding.name.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
 
+            }
+
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                if (checkValidInfo()) {
+                    binding.signup.setEnabled(true);
+                } else {
+                    binding.signup.setEnabled(false);
+                }
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+
+            }
+
+        });
+
+        //button sign up click
         binding.signup.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -173,11 +188,17 @@ public class RegisterFragment extends Fragment {
                 String image = "https://firebasestorage.googleapis.com/v0/b/messenger-9b343.appspot.com/o/profile.png?alt=media&token=01a2be09-ec0c-4e51-9358-399d22a7b3e1";
                 User user = new User(auth.getUid(), binding.name.getText().toString(), binding.email.getText().toString(), image, "Offline", 0);
                 bundle.putSerializable("user", user);
+                bundle.putString("email", binding.email.getText().toString());
                 bundle.putString("password", binding.password.getText().toString());
                 Navigation.findNavController(view).navigate(R.id.otpFragment, bundle);
             }
         });
+    }
 
-        return root;
+    private Boolean checkValidInfo(){
+        if(binding.name.getText().toString().isEmpty() || binding.email.getText().toString().isEmpty()
+                || binding.password.getText().toString().isEmpty() || binding.rePass.getText().toString().isEmpty())
+            return false;
+        return true;
     }
 }

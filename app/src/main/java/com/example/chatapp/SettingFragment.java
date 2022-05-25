@@ -37,7 +37,7 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.squareup.picasso.Picasso;
 
-public class SettingFragment extends Fragment {
+public class SettingFragment extends HandlerUser {
 
     User user = new User();
     Uri rsImage;
@@ -178,4 +178,6 @@ public class SettingFragment extends Fragment {
             }
         }
     }
+
+
 }

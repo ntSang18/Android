@@ -3,6 +3,9 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Users/lengo/AndroidStudioProjects/github/Chat-App/app/src/main/res/layout/fragment_login.xml" value="0.340625" />
+        <entry key="..\:/Users/lengo/AndroidStudioProjects/github/Chat-App/app/src/main/res/layout/fragment_opt.xml" value="0.340625" />
+        <entry key="..\:/Users/lengo/AndroidStudioProjects/github/Chat-App/app/src/main/res/layout/fragment_reset_password.xml" value="0.340625" />
         <entry key="..\:/Users/lengo/AndroidStudioProjects/github/DiDong/Chat-App/app/src/main/res/drawable-v24/ic_launcher_foreground.xml" value="0.1765" />
         <entry key="..\:/Users/lengo/AndroidStudioProjects/github/DiDong/Chat-App/app/src/main/res/drawable/empty_bac.xml" value="0.1765" />
         <entry key="..\:/Users/lengo/AndroidStudioProjects/github/DiDong/Chat-App/app/src/main/res/drawable/ic_baseline_exit_to_app_24.xml" value="0.18" />
