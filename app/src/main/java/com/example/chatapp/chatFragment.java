@@ -1,24 +1,25 @@
 package com.example.chatapp;
 
+import android.os.Build;
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import androidx.navigation.Navigation;
-import androidx.recyclerview.widget.LinearLayoutManager;
-
-import android.util.Log;
+import android.text.InputFilter;
+import android.text.Spanned;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
+import androidx.fragment.app.Fragment;
+import androidx.navigation.Navigation;
+import androidx.recyclerview.widget.LinearLayoutManager;
+
 import com.example.chatapp.Model.Message;
 import com.example.chatapp.Model.User;
 import com.example.chatapp.ViewModel.MessagesAdapter;
 import com.example.chatapp.databinding.FragmentChatBinding;
-import com.example.chatapp.databinding.FragmentOptBinding;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
@@ -29,6 +30,9 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -67,14 +71,14 @@ public class chatFragment extends Fragment {
         userSend.setUid(auth.getUid());
 
         messageList = new ArrayList<>();
-        LinearLayoutManager linearLayoutManager= new LinearLayoutManager(getContext());
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
         linearLayoutManager.setStackFromEnd(true);
         binding.messageAdapter.setLayoutManager(linearLayoutManager);
         adapter = new MessagesAdapter(messageList);
         binding.messageAdapter.setAdapter(adapter);
 
-        senderRoom = userSend.getUid()+userReceive.getUid();
-        receiverRoom=userReceive.getUid()+userSend.getUid();
+        senderRoom = userSend.getUid() + userReceive.getUid();
+        receiverRoom = userReceive.getUid() + userSend.getUid();
 
         DatabaseReference reference = database.getReference().child("users").child(auth.getUid());
         DatabaseReference chatReference = database.getReference().child("chats").child(senderRoom).child("messages");
@@ -82,8 +86,8 @@ public class chatFragment extends Fragment {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 messageList.clear();
-                for(DataSnapshot dataSnapshot:snapshot.getChildren()){
-                    Message message=dataSnapshot.getValue(Message.class);
+                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                    Message message = dataSnapshot.getValue(Message.class);
                     messageList.add(message);
                 }
                 adapter.notifyDataSetChanged();
@@ -108,10 +112,11 @@ public class chatFragment extends Fragment {
         });
 
         binding.sendBtn.setOnClickListener(new View.OnClickListener() {
+            @RequiresApi(api = Build.VERSION_CODES.O)
             @Override
             public void onClick(View v) {
                 String message = binding.edtMessage.getText().toString();
-                if (message.isEmpty()){
+                if (message.isEmpty()) {
                     Toast.makeText(getContext(), "Please enter valid message", Toast.LENGTH_SHORT).show();
                     return;
                 }
@@ -124,20 +129,28 @@ public class chatFragment extends Fragment {
                         .child("messages")
                         .push()
                         .setValue(messages).addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        database.getReference().child("chats")
-                                .child(receiverRoom)
-                                .child("messages")
-                                .push()
-                                .setValue(messages).addOnCompleteListener(new OnCompleteListener<Void>() {
                             @Override
                             public void onComplete(@NonNull Task<Void> task) {
+                                database.getReference().child("chats")
+                                        .child(receiverRoom)
+                                        .child("messages")
+                                        .push()
+                                        .setValue(messages).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                            @Override
+                                            public void onComplete(@NonNull Task<Void> task) {
 
+                                            }
+                                        });
                             }
                         });
-                    }
-                });
+
+                // set recentActivity for user
+                LocalDateTime now = LocalDateTime.now();
+                ZonedDateTime zdt = now.atZone(ZoneId.of("America/Los_Angeles"));
+                long millis = zdt.toInstant().toEpochMilli();
+                reference.child("recentActivity").setValue(millis);
+                DatabaseReference referenceReceive = database.getReference().child("users").child(userReceive.getUid());
+                referenceReceive.child("recentActivity").setValue(millis);
             }
         });
 
@@ -148,6 +161,7 @@ public class chatFragment extends Fragment {
             }
         });
 
+
         return root;
     }
 
@@ -155,4 +169,6 @@ public class chatFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
     }
+
+
 }
