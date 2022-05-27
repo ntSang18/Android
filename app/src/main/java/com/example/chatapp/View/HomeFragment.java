@@ -1,19 +1,17 @@
-package com.example.chatapp;
+package com.example.chatapp.View;
 
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
-import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
-import android.provider.ContactsContract;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.chatapp.Model.User;
+import com.example.chatapp.R;
 import com.example.chatapp.ViewModel.UserAdapter;
 import com.example.chatapp.databinding.FragmentHomeBinding;
 import com.google.firebase.auth.FirebaseAuth;
@@ -78,6 +76,7 @@ public class HomeFragment extends HandlerUser {
             });
             // TSang: Get list user
             reference = database.getReference().child("users");
+
             reference.addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -90,6 +89,8 @@ public class HomeFragment extends HandlerUser {
                         }
                     }
                     userAdapter.notifyDataSetChanged();
+                    binding.placeHolder.stopShimmerAnimation();
+                    binding.placeHolder.setVisibility(View.GONE);
                 }
 
                 @Override
@@ -110,6 +111,4 @@ public class HomeFragment extends HandlerUser {
 
         return root;
     }
-
-
 }

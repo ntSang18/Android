@@ -5,10 +5,12 @@
       <map>
         <entry key="..\:/K6/LapTrinhDiDong/ChatApp/app/src/main/res/drawable-v24/receiver_shape.xml" value="0.18518518518518517" />
         <entry key="..\:/K6/LapTrinhDiDong/ChatApp/app/src/main/res/drawable/background_chat_input.xml" value="0.18518518518518517" />
+        <entry key="..\:/K6/LapTrinhDiDong/ChatApp/app/src/main/res/drawable/chat_container.xml" value="0.19907407407407407" />
         <entry key="..\:/K6/LapTrinhDiDong/ChatApp/app/src/main/res/drawable/ic_back.xml" value="0.1824074074074074" />
         <entry key="..\:/K6/LapTrinhDiDong/ChatApp/app/src/main/res/drawable/ic_baseline_send_24.xml" value="0.1824074074074074" />
         <entry key="..\:/K6/LapTrinhDiDong/ChatApp/app/src/main/res/drawable/search_bar.xml" value="0.18518518518518517" />
         <entry key="..\:/K6/LapTrinhDiDong/ChatApp/app/src/main/res/drawable/sender_shape.xml" value="0.18518518518518517" />
+        <entry key="..\:/K6/LapTrinhDiDong/ChatApp/app/src/main/res/drawable/shape_image.xml" value="0.20185185185185187" />
         <entry key="..\:/K6/LapTrinhDiDong/ChatApp/app/src/main/res/layout/activity_main.xml" value="0.22447916666666667" />
         <entry key="..\:/K6/LapTrinhDiDong/ChatApp/app/src/main/res/layout/fragment_chat.xml" value="0.21041666666666667" />
         <entry key="..\:/K6/LapTrinhDiDong/ChatApp/app/src/main/res/layout/fragment_home.xml" value="0.22447916666666667" />
@@ -19,8 +21,10 @@
         <entry key="..\:/K6/LapTrinhDiDong/ChatApp/app/src/main/res/layout/fragment_setting.xml" value="0.22447916666666667" />
         <entry key="..\:/K6/LapTrinhDiDong/ChatApp/app/src/main/res/layout/item_online.xml" value="0.22447916666666667" />
         <entry key="..\:/K6/LapTrinhDiDong/ChatApp/app/src/main/res/layout/item_profile.xml" value="0.22447916666666667" />
+        <entry key="..\:/K6/LapTrinhDiDong/ChatApp/app/src/main/res/layout/placeholder_item_online.xml" value="0.22447916666666667" />
         <entry key="..\:/K6/LapTrinhDiDong/ChatApp/app/src/main/res/layout/receiver_item.xml" value="0.22447916666666667" />
         <entry key="..\:/K6/LapTrinhDiDong/ChatApp/app/src/main/res/layout/sender_item.xml" value="0.22447916666666667" />
+        <entry key="..\:/K6/LapTrinhDiDong/ChatApp/app/src/main/res/layout/sender_item1.xml" value="0.22447916666666667" />
       </map>
     </option>
   </component>

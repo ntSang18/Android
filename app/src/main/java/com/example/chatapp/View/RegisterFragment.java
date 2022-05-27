@@ -1,4 +1,4 @@
-package com.example.chatapp;
+package com.example.chatapp.View;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -15,6 +15,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.chatapp.Model.User;
+import com.example.chatapp.R;
 import com.example.chatapp.databinding.FragmentRegisterBinding;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.FirebaseDatabase;
