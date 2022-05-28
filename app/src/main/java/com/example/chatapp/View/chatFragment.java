@@ -113,7 +113,7 @@ public class chatFragment extends Fragment {
         });
 
         binding.sendBtn.setOnClickListener(new View.OnClickListener() {
-            @RequiresApi(api = Build.VERSION_CODES.O)
+//            @RequiresApi(api = Build.VERSION_CODES.O)
             @Override
             public void onClick(View v) {
                 String message = binding.edtMessage.getText().toString();
@@ -146,12 +146,12 @@ public class chatFragment extends Fragment {
                         });
 
                 // set recentActivity for user
-                LocalDateTime now = LocalDateTime.now();
-                ZonedDateTime zdt = now.atZone(ZoneId.of("America/Los_Angeles"));
-                long millis = zdt.toInstant().toEpochMilli();
-                reference.child("recentActivity").setValue(millis);
-                DatabaseReference referenceReceive = database.getReference().child("users").child(userReceive.getUid());
-                referenceReceive.child("recentActivity").setValue(millis);
+//                LocalDateTime now = LocalDateTime.now();
+//                ZonedDateTime zdt = now.atZone(ZoneId.of("America/Los_Angeles"));
+//                long millis = zdt.toInstant().toEpochMilli();
+//                reference.child("recentActivity").setValue(millis);
+//                DatabaseReference referenceReceive = database.getReference().child("users").child(userReceive.getUid());
+//                referenceReceive.child("recentActivity").setValue(millis);
             }
         });
 
