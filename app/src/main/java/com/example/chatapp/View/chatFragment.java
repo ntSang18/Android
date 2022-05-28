@@ -1,4 +1,4 @@
-package com.example.chatapp;
+package com.example.chatapp.View;
 
 import android.os.Build;
 import android.os.Bundle;
@@ -18,6 +18,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.example.chatapp.Model.Message;
 import com.example.chatapp.Model.User;
+import com.example.chatapp.R;
 import com.example.chatapp.ViewModel.MessagesAdapter;
 import com.example.chatapp.databinding.FragmentChatBinding;
 import com.google.android.gms.tasks.OnCompleteListener;

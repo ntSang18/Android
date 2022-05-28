@@ -3,8 +3,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context=".chatFragment">
+    tools:context=".View.chatFragment"
+    android:background="#1C2E46">
 
     <!-- TODO: Update blank fragment layout -->
     <LinearLayout
@@ -43,7 +43,7 @@
                 android:layout_height="wrap_content"
                 android:text="User receive name"
                 android:gravity="start"
-                android:textColor="#000"
+                android:textColor="#ffff"
                 android:textSize="18dp"
                 android:textStyle="bold"></TextView>
 
@@ -53,7 +53,7 @@
                 android:layout_height="wrap_content"
                 android:text="Offline"
                 android:gravity="start"
-                android:textColor="#D2000000"
+                android:textColor="#9AFFFFFF"
                 android:textSize="13dp"></TextView>
         </LinearLayout>
 
@@ -64,14 +64,16 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_above="@id/ll3"
-        android:layout_below="@+id/ll1" />
+        android:layout_below="@+id/ll1"
+        android:background="@drawable/chat_container"
+        android:padding="8dp" />
 
     <LinearLayout
         android:id="@+id/ll3"
         android:layout_alignParentBottom="true"
         android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_margin="2dp"
+        android:layout_margin="4dp"
         android:layout_height="wrap_content">
 
         <EditText

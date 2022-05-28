@@ -7,37 +7,37 @@
 
     <fragment
         android:id="@+id/loginFragment"
-        android:name="com.example.chatapp.LoginFragment"
+        android:name="com.example.chatapp.View.LoginFragment"
         android:label="fragment_login"
         tools:layout="@layout/fragment_login" />
     <fragment
         android:id="@+id/introFragment"
-        android:name="com.example.chatapp.IntroFragment"
+        android:name="com.example.chatapp.View.IntroFragment"
         android:label="fragment_intro"
         tools:layout="@layout/fragment_intro" />
     <fragment
         android:id="@+id/registerFragment"
-        android:name="com.example.chatapp.RegisterFragment"
+        android:name="com.example.chatapp.View.RegisterFragment"
         android:label="fragment_register"
         tools:layout="@layout/fragment_register" />
     <fragment
         android:id="@+id/homeFragment"
-        android:name="com.example.chatapp.HomeFragment"
+        android:name="com.example.chatapp.View.HomeFragment"
         android:label="fragment_home"
         tools:layout="@layout/fragment_home" />
     <fragment
         android:id="@+id/otpFragment"
-        android:name="com.example.chatapp.OtpFragment"
+        android:name="com.example.chatapp.View.OtpFragment"
         android:label="fragment_o_t_p"
         tools:layout="@layout/fragment_opt" />
     <fragment
         android:id="@+id/settingFragment"
-        android:name="com.example.chatapp.SettingFragment"
+        android:name="com.example.chatapp.View.SettingFragment"
         android:label="fragment_setting"
         tools:layout="@layout/fragment_setting" />
     <fragment
         android:id="@+id/chatFragment"
-        android:name="com.example.chatapp.chatFragment"
+        android:name="com.example.chatapp.View.chatFragment"
         android:label="fragment_chat"
         tools:layout="@layout/fragment_chat" />
 </navigation>

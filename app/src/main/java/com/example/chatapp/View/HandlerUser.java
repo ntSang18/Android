@@ -1,4 +1,4 @@
-package com.example.chatapp;
+package com.example.chatapp.View;
 
 import androidx.fragment.app.Fragment;
 
