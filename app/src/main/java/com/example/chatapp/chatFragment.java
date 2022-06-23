@@ -177,5 +177,5 @@ public class chatFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
     }
 
-
+//thay Vu dep chai
 }
