@@ -5,7 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".View.HomeFragment">
+    tools:context=".HomeFragment">
 
     <!-- TODO: Update blank fragment layout -->
     <LinearLayout
@@ -15,20 +15,19 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="10dp"
+            android:layout_margin="10dp"
+            android:gravity="center_vertical"
             android:orientation="horizontal">
 
             <de.hdodenhof.circleimageview.CircleImageView
                 android:id="@+id/imgView"
                 android:src="@drawable/profile"
-                android:layout_width="28dp"
-                android:layout_height="28dp"
-                android:layout_gravity="center_vertical"/>
+                android:layout_width="50dp"
+                android:layout_height="50dp"/>
 
             <TextView
                 android:text="Chats"
                 android:layout_marginLeft="10dp"
-                android:layout_gravity="center_vertical"
                 android:textSize="27sp"
                 android:textStyle="bold"
                 android:layout_width="wrap_content"
@@ -39,50 +38,14 @@
 
         </LinearLayout>
 
-        <SearchView
-            android:id="@+id/search"
-            android:layout_width="match_parent"
-            android:layout_height="35dp"
-            android:layout_marginBottom="10dp"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp"
-            android:queryHint="Search"
-            android:background="@drawable/search_bar"
-            android:iconifiedByDefault="false"
-            android:queryBackground="@null"/>
+
 
         <!--Tạo 1 danh sách các user online nằm ngang-->
-
-        <com.facebook.shimmer.ShimmerFrameLayout
-            android:id="@+id/placeHolder"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="horizontal"
-                android:gravity="center_horizontal">
-                <include layout="@layout/placeholder_item_online"/>
-
-                <include layout="@layout/placeholder_item_online"/>
-
-                <include layout="@layout/placeholder_item_online"/>
-
-                <include layout="@layout/placeholder_item_online"/>
-
-                <include layout="@layout/placeholder_item_online"/>
-
-            </LinearLayout>
-
-        </com.facebook.shimmer.ShimmerFrameLayout>
-
         <LinearLayout
             android:layout_marginTop="6dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_horizontal">
+            android:orientation="horizontal">
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/onlines"
@@ -91,6 +54,16 @@
                 android:orientation="horizontal"
                 tools:listitem="@layout/item_online" />
         </LinearLayout>
+
+
+        <SearchView
+            android:id="@+id/search"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:queryHint="Search"
+            android:background="@drawable/search_bar"
+            android:iconifiedByDefault="false"/>
 
 
 

@@ -1,7 +1,7 @@
 package com.example.chatapp.ViewModel;
 
-import static com.example.chatapp.View.chatFragment.userReceive;
-import static com.example.chatapp.View.chatFragment.userSend;
+import static com.example.chatapp.chatFragment.userReceive;
+import static com.example.chatapp.chatFragment.userSend;
 
 import android.view.LayoutInflater;
 import android.view.View;

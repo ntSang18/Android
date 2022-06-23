@@ -1,4 +1,4 @@
-package com.example.chatapp.View;
+package com.example.chatapp;
 
 import android.content.Context;
 import android.content.Intent;
@@ -17,7 +17,6 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.example.chatapp.Model.User;
-import com.example.chatapp.R;
 import com.example.chatapp.databinding.FragmentOptBinding;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
