@@ -1,18 +1,23 @@
-package com.example.chatapp.View;
+package com.example.chatapp;
 
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import android.provider.ContactsContract;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.SearchView;
+import android.widget.Toast;
 
 import com.example.chatapp.Model.User;
-import com.example.chatapp.R;
 import com.example.chatapp.ViewModel.UserAdapter;
+import com.example.chatapp.ViewModel.UserChatAdapter;
 import com.example.chatapp.databinding.FragmentHomeBinding;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -23,7 +28,10 @@ import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
 
 
 public class HomeFragment extends HandlerUser {
@@ -32,7 +40,10 @@ public class HomeFragment extends HandlerUser {
     FirebaseDatabase database = FirebaseDatabase.getInstance();
     User user = new User();
     UserAdapter userAdapter;
-    List<User> userList;
+    UserChatAdapter userAdapterChat;
+    ArrayList<User> userList;
+    ArrayList<User> userListChat;
+    FragmentHomeBinding binding;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -47,13 +58,17 @@ public class HomeFragment extends HandlerUser {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        FragmentHomeBinding binding = FragmentHomeBinding.inflate(inflater, container, false);
+        binding = FragmentHomeBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
         // TSang: Get list user
         userList = new ArrayList<>();
+        userListChat = new ArrayList<>();
         userAdapter = new UserAdapter(userList);
+        userAdapterChat = new UserChatAdapter(userListChat, getContext());
         binding.onlines.setAdapter(userAdapter);
+        binding.chats.setAdapter(userAdapterChat);
         binding.onlines.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
+        binding.chats.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
         // End
 
         if(auth.getCurrentUser() == null){
@@ -76,7 +91,6 @@ public class HomeFragment extends HandlerUser {
             });
             // TSang: Get list user
             reference = database.getReference().child("users");
-
             reference.addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -85,12 +99,37 @@ public class HomeFragment extends HandlerUser {
                         if (!dataSnapshot.getKey().equals(auth.getUid())){
                             User user = dataSnapshot.getValue(User.class);
                             user.setUid(dataSnapshot.getKey());
+
                             userList.add(user);
                         }
                     }
                     userAdapter.notifyDataSetChanged();
-                    binding.placeHolder.stopShimmerAnimation();
-                    binding.placeHolder.setVisibility(View.GONE);
+                    DatabaseReference reference = database.getReference().child("chats");
+                    reference.addValueEventListener(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+                            userListChat.clear();
+                            for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                                for (User user : userList){
+                                    if(dataSnapshot.getKey().contains(user.getUid()) && dataSnapshot.getKey().contains(auth.getUid()) && !userListChat.contains(user))
+                                        userListChat.add(user);
+                                }
+                            }
+                            Collections.sort(userListChat, new Comparator<User>() {
+                                @Override
+                                public int compare(User o1, User o2) {
+                                    return Long.compare(o2.getRecentActivity(), o1.getRecentActivity());
+                                }
+                            });
+
+                            userAdapterChat.notifyDataSetChanged();
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError error) {
+
+                        }
+                    });
                 }
 
                 @Override
@@ -98,6 +137,7 @@ public class HomeFragment extends HandlerUser {
 
                 }
             });
+
             // End get list user
 
             binding.imgView.setOnClickListener(new View.OnClickListener() {
@@ -107,8 +147,33 @@ public class HomeFragment extends HandlerUser {
                 }
             });
 
+            binding.search.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+                @Override
+                public boolean onQueryTextSubmit(String s) {
+                    return false;
+                }
+
+                @Override
+                public boolean onQueryTextChange(String s) {
+                    filter(s);
+                    return true;
+                }
+            });
+
         }
 
         return root;
     }
+
+    private void filter(String newText) {
+        ArrayList<User> list = new ArrayList<>();
+
+        for (User user : userListChat) {
+            if (user.getName().toLowerCase().contains(newText.toLowerCase())) {
+                list.add(user);
+            }
+        }
+        userAdapterChat.filterList(list);
+    }
+
 }

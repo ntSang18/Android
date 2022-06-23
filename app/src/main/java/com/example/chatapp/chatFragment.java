@@ -1,5 +1,9 @@
-package com.example.chatapp.View;
+package com.example.chatapp;
 
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.InputFilter;
@@ -18,7 +22,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.example.chatapp.Model.Message;
 import com.example.chatapp.Model.User;
-import com.example.chatapp.R;
 import com.example.chatapp.ViewModel.MessagesAdapter;
 import com.example.chatapp.databinding.FragmentChatBinding;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -48,6 +51,7 @@ public class chatFragment extends Fragment {
     String senderRoom, receiverRoom;
     List<Message> messageList;
     MessagesAdapter adapter;
+    private String checker = "";
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -113,7 +117,7 @@ public class chatFragment extends Fragment {
         });
 
         binding.sendBtn.setOnClickListener(new View.OnClickListener() {
-//            @RequiresApi(api = Build.VERSION_CODES.O)
+            @RequiresApi(api = Build.VERSION_CODES.O)
             @Override
             public void onClick(View v) {
                 String message = binding.edtMessage.getText().toString();
@@ -146,12 +150,12 @@ public class chatFragment extends Fragment {
                         });
 
                 // set recentActivity for user
-//                LocalDateTime now = LocalDateTime.now();
-//                ZonedDateTime zdt = now.atZone(ZoneId.of("America/Los_Angeles"));
-//                long millis = zdt.toInstant().toEpochMilli();
-//                reference.child("recentActivity").setValue(millis);
-//                DatabaseReference referenceReceive = database.getReference().child("users").child(userReceive.getUid());
-//                referenceReceive.child("recentActivity").setValue(millis);
+                LocalDateTime now = LocalDateTime.now();
+                ZonedDateTime zdt = now.atZone(ZoneId.of("America/Los_Angeles"));
+                long millis = zdt.toInstant().toEpochMilli();
+                reference.child("recentActivity").setValue(millis);
+                DatabaseReference referenceReceive = database.getReference().child("users").child(userReceive.getUid());
+                referenceReceive.child("recentActivity").setValue(millis);
             }
         });
 
@@ -161,6 +165,8 @@ public class chatFragment extends Fragment {
                 Navigation.findNavController(getView()).navigate(R.id.homeFragment);
             }
         });
+
+
 
 
         return root;

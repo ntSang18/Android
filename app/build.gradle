@@ -62,7 +62,4 @@ dependencies {
     implementation 'com.sun.mail:android-activation:1.6.7'
     implementation 'de.hdodenhof:circleimageview:3.1.0'
     implementation 'com.squareup.picasso:picasso:2.8'
-
-    // PlaceHolder
-    implementation 'com.facebook.shimmer:shimmer:0.1.0@aar'
 }

@@ -1,9 +1,10 @@
-package com.example.chatapp.View;
+package com.example.chatapp;
 
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.core.util.PatternsCompat;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
@@ -13,11 +14,15 @@ import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.example.chatapp.Model.User;
-import com.example.chatapp.R;
 import com.example.chatapp.databinding.FragmentRegisterBinding;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 
@@ -28,6 +33,10 @@ public class RegisterFragment extends Fragment {
 
     FirebaseAuth auth = FirebaseAuth.getInstance();
     private FragmentRegisterBinding binding;
+    FirebaseDatabase database = FirebaseDatabase.getInstance();
+
+    SharedPreferences preferences;
+    SharedPreferences.Editor ed;
 
 
     @Override
@@ -53,6 +62,9 @@ public class RegisterFragment extends Fragment {
         if(!checkValidInfo()){
             binding.signup.setEnabled(false);
         }
+
+        preferences = getContext().getSharedPreferences("user.txt", Context.MODE_PRIVATE);
+        ed = preferences.edit();
 
         setlisteners();
 
@@ -185,13 +197,35 @@ public class RegisterFragment extends Fragment {
                     return;
                 }
 
-                Bundle bundle = new Bundle();
+
                 String image = "https://firebasestorage.googleapis.com/v0/b/messenger-9b343.appspot.com/o/profile.png?alt=media&token=01a2be09-ec0c-4e51-9358-399d22a7b3e1";
                 User user = new User(auth.getUid(), binding.name.getText().toString(), binding.email.getText().toString(), image, "Offline", 0);
-                bundle.putSerializable("user", user);
-                bundle.putString("email", binding.email.getText().toString());
-                bundle.putString("password", binding.password.getText().toString());
-                Navigation.findNavController(view).navigate(R.id.otpFragment, bundle);
+                user.setEmail(binding.email.getText().toString());
+                auth.createUserWithEmailAndPassword(user.getEmail(), binding.password.getText().toString())
+                        .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+
+                            @Override
+                            public void onComplete(@NonNull Task<AuthResult> task) {
+                                if (task.isSuccessful()) {
+                                    DatabaseReference reference = database.getReference().child("users").child(auth.getUid());
+                                    reference.setValue(user).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                        @Override
+                                        public void onComplete(@NonNull Task<Void> task) {
+                                            if (task.isSuccessful()){
+                                                Navigation.findNavController(getView()).navigate(R.id.homeFragment);
+                                                ed.putString("email", binding.email.getText().toString());
+                                                ed.putString("password", binding.password.getText().toString());
+                                                ed.apply();
+                                            }else {
+                                                Toast.makeText(getContext(), "Error in Creating a new User", Toast.LENGTH_SHORT).show();
+                                            }
+                                        }
+                                    });
+                                }else {
+                                    Toast.makeText(getContext(), "Error in Creating a new User", Toast.LENGTH_SHORT).show();
+                                }
+                            }
+                        });
             }
         });
     }

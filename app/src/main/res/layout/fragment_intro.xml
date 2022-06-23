@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_centerHorizontal="true"
-    tools:context=".View.IntroFragment"
+    tools:context=".IntroFragment"
     android:background="#14162B">
 
     <!-- TODO: Update blank fragment layout -->
