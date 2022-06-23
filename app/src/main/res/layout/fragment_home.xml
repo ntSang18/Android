@@ -38,14 +38,7 @@
 
         </LinearLayout>
 
-        <SearchView
-            android:id="@+id/search"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="10dp"
-            android:queryHint="Search"
-            android:background="@drawable/search_bar"
-            android:iconifiedByDefault="false"/>
+
 
         <!--Tạo 1 danh sách các user online nằm ngang-->
         <LinearLayout
@@ -61,6 +54,16 @@
                 android:orientation="horizontal"
                 tools:listitem="@layout/item_online" />
         </LinearLayout>
+
+
+        <SearchView
+            android:id="@+id/search"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:queryHint="Search"
+            android:background="@drawable/search_bar"
+            android:iconifiedByDefault="false"/>
 
 
 

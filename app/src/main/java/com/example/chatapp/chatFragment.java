@@ -1,5 +1,9 @@
 package com.example.chatapp;
 
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.InputFilter;
@@ -47,6 +51,7 @@ public class chatFragment extends Fragment {
     String senderRoom, receiverRoom;
     List<Message> messageList;
     MessagesAdapter adapter;
+    private String checker = "";
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -160,6 +165,8 @@ public class chatFragment extends Fragment {
                 Navigation.findNavController(getView()).navigate(R.id.homeFragment);
             }
         });
+
+
 
 
         return root;
