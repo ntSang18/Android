@@ -176,4 +176,6 @@ public class HomeFragment extends HandlerUser {
         userAdapterChat.filterList(list);
     }
 
+
+
 }

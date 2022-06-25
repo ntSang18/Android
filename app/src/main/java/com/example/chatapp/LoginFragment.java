@@ -103,7 +103,6 @@ public class LoginFragment extends Fragment {
                                                         ed.putString("email", binding.email.getText().toString());
                                                         ed.putString("password", binding.password.getText().toString());
                                                         ed.apply();
-
                                                         Navigation.findNavController(getView()).navigate(R.id.homeFragment);
                                                     } else {
                                                         Toast.makeText(getContext(), "Your account is currently logged in somewhere else!", Toast.LENGTH_LONG).show();
