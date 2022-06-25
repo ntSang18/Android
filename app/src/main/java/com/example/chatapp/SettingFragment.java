@@ -91,9 +91,14 @@ public class SettingFragment extends HandlerUser {
             @Override
             public void onClick(View view) {
 
-                reference.child("status").setValue("Offline");
-                FirebaseAuth.getInstance().signOut();
-                Navigation.findNavController(getView()).navigate(R.id.loginFragment);
+                reference.child("status").setValue("Offline").addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        FirebaseAuth.getInstance().signOut();
+                        Navigation.findNavController(getView()).navigate(R.id.loginFragment);
+                    }
+                });
+
             }
         });
 
