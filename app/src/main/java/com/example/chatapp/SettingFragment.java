@@ -146,7 +146,7 @@ public class SettingFragment extends HandlerUser {
                                         user.updatePassword(binding.password.getText().toString()).addOnCompleteListener(new OnCompleteListener<Void>() {
                                             @Override
                                             public void onComplete(@NonNull Task<Void> task) {
-                                                ed.putString("pass", binding.password.getText().toString());
+                                                ed.putString("password", binding.password.getText().toString());
                                                 ed.apply();
                                             }
                                         });
@@ -181,14 +181,18 @@ public class SettingFragment extends HandlerUser {
         return root;
     }
 
+    
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
         if (requestCode == 10) {
             if (data != null) {
-                rsImage = data.getData();
-                binding.image.setImageURI(rsImage);
+                if(data.getData() != null){
+                    rsImage = data.getData();
+                    binding.image.setImageURI(rsImage);
+                }
             }
         }
     }
