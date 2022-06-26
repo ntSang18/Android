@@ -7,6 +7,7 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -145,7 +146,7 @@ public class SettingFragment extends HandlerUser {
                                         user.updatePassword(binding.password.getText().toString()).addOnCompleteListener(new OnCompleteListener<Void>() {
                                             @Override
                                             public void onComplete(@NonNull Task<Void> task) {
-                                                ed.putString("pass", binding.password.getText().toString());
+                                                ed.putString("password", binding.password.getText().toString());
                                                 ed.apply();
                                             }
                                         });
@@ -169,8 +170,18 @@ public class SettingFragment extends HandlerUser {
             }
         });
 
+        OnBackPressedCallback callback = new OnBackPressedCallback(true /* enabled by default */) {
+            @Override
+            public void handleOnBackPressed() {
+                Navigation.findNavController(getView()).navigate(R.id.homeFragment);
+            }
+        };
+        requireActivity().getOnBackPressedDispatcher().addCallback(getActivity(), callback);
+
         return root;
     }
+
+    
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
@@ -178,8 +189,10 @@ public class SettingFragment extends HandlerUser {
 
         if (requestCode == 10) {
             if (data != null) {
-                rsImage = data.getData();
-                binding.image.setImageURI(rsImage);
+                if(data.getData() != null){
+                    rsImage = data.getData();
+                    binding.image.setImageURI(rsImage);
+                }
             }
         }
     }
