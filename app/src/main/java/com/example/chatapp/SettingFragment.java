@@ -1,24 +1,30 @@
 package com.example.chatapp;
 
-import android.app.Dialog;
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.activity.OnBackPressedCallback;
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
 
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.TextView;
-import android.widget.Toast;
-
+import com.bumptech.glide.Glide;
 import com.example.chatapp.Model.User;
 import com.example.chatapp.databinding.FragmentSettingBinding;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -36,13 +42,16 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
-import com.squareup.picasso.Picasso;
 
-public class SettingFragment extends HandlerUser {
+import java.io.IOException;
+import java.lang.ref.WeakReference;
+
+public class SettingFragment extends Fragment {
 
     User user = new User();
     Uri rsImage;
     FragmentSettingBinding binding;
+    ActivityResultLauncher<Intent> activityResultLauncherGallery;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -71,7 +80,7 @@ public class SettingFragment extends HandlerUser {
                 user.setImageUri(snapshot.child("imageUri").getValue().toString());
 
                 binding.name.setText(user.getName());
-                Picasso.get().load(user.getImageUri()).into(binding.image);
+                Glide.with(getContext()).load(user.getImageUri()).into(binding.image);
             }
 
             @Override
@@ -83,7 +92,7 @@ public class SettingFragment extends HandlerUser {
         SharedPreferences preferences = getContext().getSharedPreferences("user.txt", Context.MODE_PRIVATE);
         SharedPreferences.Editor ed = preferences.edit();
 
-        Picasso.get().load(user.getImageUri()).into(binding.image);
+        Glide.with(getContext()).load(user.getImageUri()).into(binding.image);
         binding.name.setText(user.getName());
         binding.email.setText(preferences.getString("email", ""));
         binding.password.setText(preferences.getString("password", ""));
@@ -109,9 +118,10 @@ public class SettingFragment extends HandlerUser {
                 if (!binding.name.getText().toString().equals(user.getName())) {
                     reference.child("name").setValue(binding.name.getText().toString());
                 }
-                if (rsImage != null){
-                    if(!user.getImageUri().equals(rsImage.toString())){
-                        StorageReference storageReference = storage.getReference().child("upload").child(auth.getUid());
+                if(!user.getImageUri().equals(rsImage.toString())){
+                    StorageReference storageReference = storage.getReference().child("upload").child(auth.getUid());
+
+                    if (rsImage != null){
                         storageReference.putFile(rsImage).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
                             @Override
                             public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
@@ -126,7 +136,6 @@ public class SettingFragment extends HandlerUser {
                             }
                         });
                     }
-
                 }
 
                 FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
@@ -163,10 +172,8 @@ public class SettingFragment extends HandlerUser {
         binding.image.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent();
-                intent.setType("image/*");
-                intent.setAction(Intent.ACTION_GET_CONTENT);
-                startActivityForResult(Intent.createChooser(intent, "Select Picture"), 10);
+                Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                activityResultLauncherGallery.launch(intent);
             }
         });
 
@@ -178,24 +185,30 @@ public class SettingFragment extends HandlerUser {
         };
         requireActivity().getOnBackPressedDispatcher().addCallback(getActivity(), callback);
 
+        activityResultLauncherGallery = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), new ActivityResultCallback<ActivityResult>() {
+            @Override
+            public void onActivityResult(ActivityResult result) {
+                if (result.getResultCode() == Activity.RESULT_OK){
+                    Intent data = result.getData();
+                    if (data != null){
+                        Uri selectedImageUri = data.getData();
+                        binding.image.setImageURI(selectedImageUri);
+                        rsImage = selectedImageUri;
+                    }
+                }
+            }
+        });
+
         return root;
     }
 
-    
-
     @Override
-    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        if (requestCode == 10) {
-            if (data != null) {
-                if(data.getData() != null){
-                    rsImage = data.getData();
-                    binding.image.setImageURI(rsImage);
-                }
-            }
+    public void onResume() {
+        super.onResume();
+        if(FirebaseAuth.getInstance().getCurrentUser()!=null){
+            FirebaseDatabase database = FirebaseDatabase.getInstance();
+            DatabaseReference reference = database.getReference().child("users").child(FirebaseAuth.getInstance().getUid());
+            reference.child("status").setValue("Online");
         }
     }
-
-
 }

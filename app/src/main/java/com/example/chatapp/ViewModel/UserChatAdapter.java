@@ -12,6 +12,7 @@ import androidx.annotation.NonNull;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.example.chatapp.Model.Message;
 import com.example.chatapp.Model.User;
 import com.example.chatapp.R;
@@ -21,7 +22,6 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -71,7 +71,7 @@ public class UserChatAdapter extends RecyclerView.Adapter<UserChatAdapter.ViewHo
             }
         });
         holder.lMessage.setText(user.getStatus());
-        Picasso.get().load(user.getImageUri()).into(holder.circleImageView);
+        Glide.with(context).load(user.getImageUri()).into(holder.circleImageView);
 
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override

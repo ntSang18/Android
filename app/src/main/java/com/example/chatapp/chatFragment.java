@@ -1,43 +1,39 @@
 package com.example.chatapp;
 
-import static android.app.Activity.RESULT_OK;
-
 import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.ProgressDialog;
-import android.content.ContentValues;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.text.InputFilter;
-import android.text.Spanned;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
 import androidx.activity.OnBackPressedCallback;
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
-import androidx.core.content.ContextCompat;
-import androidx.fragment.app.Fragment;
+import androidx.core.content.FileProvider;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import com.bumptech.glide.Glide;
 import com.example.chatapp.Model.Message;
 import com.example.chatapp.Model.User;
 import com.example.chatapp.ViewModel.MessagesAdapter;
 import com.example.chatapp.databinding.FragmentChatBinding;
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -45,22 +41,19 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageReference;
-import com.google.firebase.storage.UploadTask;
-import com.squareup.picasso.Picasso;
 
-import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.lang.ref.WeakReference;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 
-public class chatFragment extends Fragment {
+public class chatFragment extends HandlerUser {
 
     static public User userReceive;
     static public User userSend;
@@ -70,7 +63,8 @@ public class chatFragment extends Fragment {
     String senderRoom, receiverRoom;
     List<Message> messageList;
     MessagesAdapter adapter;
-    private String checker = "";
+    ActivityResultLauncher<Intent> activityResultLauncher;
+    ActivityResultLauncher<Intent> activityResultLauncherGallery;
 
     // permissions constants
     private static final int CAMERA_REQUEST_CODE = 100;
@@ -83,7 +77,7 @@ public class chatFragment extends Fragment {
     String[] storagePermission;
     // image picked will be same in this uri
     Uri image_uri = null;
-    private boolean notify = false;
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -97,13 +91,14 @@ public class chatFragment extends Fragment {
         }
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         binding = FragmentChatBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
-        Picasso.get().load(userReceive.getImageUri()).into(binding.image);
+        Glide.with(getContext()).load(userReceive.getImageUri()).into(binding.image);
         binding.receiveName.setText(userReceive.getName());
         binding.receiveStt.setText(userReceive.getStatus());
         database = FirebaseDatabase.getInstance();
@@ -114,7 +109,7 @@ public class chatFragment extends Fragment {
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
         linearLayoutManager.setStackFromEnd(true);
         binding.messageAdapter.setLayoutManager(linearLayoutManager);
-        adapter = new MessagesAdapter(messageList);
+        adapter = new MessagesAdapter(messageList, getContext());
         binding.messageAdapter.setAdapter(adapter);
 
         senderRoom = userSend.getUid() + userReceive.getUid();
@@ -125,12 +120,14 @@ public class chatFragment extends Fragment {
         chatReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
+
                 messageList.clear();
                 for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                     Message message = dataSnapshot.getValue(Message.class);
                     messageList.add(message);
                 }
                 adapter.notifyDataSetChanged();
+
             }
 
             @Override
@@ -162,7 +159,7 @@ public class chatFragment extends Fragment {
                 }
                 binding.edtMessage.setText("");
                 Date date = new Date();
-                Message messages = new Message(message, userSend.getUid(), date.getTime());
+                Message messages = new Message(message, userSend.getUid(), date.getTime(), false);
                 database = FirebaseDatabase.getInstance();
                 database.getReference().child("chats")
                         .child(senderRoom)
@@ -216,15 +213,84 @@ public class chatFragment extends Fragment {
         };
         requireActivity().getOnBackPressedDispatcher().addCallback(getActivity(), callback);
 
+        activityResultLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), new ActivityResultCallback<ActivityResult>() {
+            @RequiresApi(api = Build.VERSION_CODES.O)
+            @Override
+            public void onActivityResult(ActivityResult result) {
+
+                Bundle extras = result.getData().getExtras();
+                Uri imageUri;
+                Bitmap imageBitmap = (Bitmap) extras.get("data");
+
+                WeakReference<Bitmap> result1 = new WeakReference<>(Bitmap.createScaledBitmap(imageBitmap,
+                        imageBitmap.getHeight(), imageBitmap.getWidth(), false).copy(
+                        Bitmap.Config.RGB_565, true
+                ));
+
+                Bitmap bm = result1.get();
+                imageUri = saveImage(bm, getContext());
+                try {
+                    sendImageMessage(imageUri);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+            }
+        });
+
+        activityResultLauncherGallery = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), new ActivityResultCallback<ActivityResult>() {
+            @Override
+            public void onActivityResult(ActivityResult result) {
+                if (result.getResultCode() == Activity.RESULT_OK){
+                    Intent data = result.getData();
+                    if (data != null){
+                        Uri selectedImageUri = data.getData();
+                        try {
+                            Bitmap bitmap = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), selectedImageUri);
+                            WeakReference<Bitmap> result1 = new WeakReference<>(Bitmap.createScaledBitmap(bitmap,
+                                    bitmap.getHeight(), bitmap.getWidth(), false).copy(
+                                    Bitmap.Config.RGB_565, true
+                            ));
+
+                            Bitmap bm = result1.get();
+                            Uri imageUri = saveImage(bm, getContext());
+                            sendImageMessage(imageUri);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+
+                    }
+                }
+            }
+        });
+
+
         return root;
+    }
+
+    private Uri saveImage(Bitmap image, Context context) {
+        File imagesFolder = new File(context.getCacheDir(), "images");
+        Uri uri = null;
+        try {
+            imagesFolder.mkdirs();
+            File file = new File(imagesFolder, "captured_image.jpg");
+            FileOutputStream stream = new FileOutputStream(file);
+            image.compress(Bitmap.CompressFormat.JPEG, 100, stream);
+            stream.flush();
+            stream.close();
+            uri = FileProvider.getUriForFile(context.getApplicationContext(), "com.example.chatapp" + ".provider", file);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return uri;
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
     }
-    private void showImagePickDialog()
-    {
+
+    private void showImagePickDialog() {
         String[] options = {"Camera", "Gallery"};
         // dialog
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
@@ -234,18 +300,10 @@ public class chatFragment extends Fragment {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 // item click handle
-                if(which == 0)
-                {
+                if (which == 0) {
                     pickFromCamera();
                 }
-                if(which == 1)
-                {
-//                    // gallery clicked
-//                    if(!checkStoragePermission())
-//                    {
-//                        requestStoragePermission();
-//                    }
-//                    else
+                if (which == 1) {
                     {
                         pickFromGallery();
                     }
@@ -254,182 +312,54 @@ public class chatFragment extends Fragment {
         });
         builder.create().show();
     }
-    private void pickFromGallery()
-    {
-        // intent to pick image from gallery
-        Intent intent = new Intent(Intent.ACTION_PICK);
-        intent.setType("image/*");
-        startActivityForResult(intent, IMAGE_PICK_GALLERY_CODE);
-    }
-    private void pickFromCamera()
-    {
-        // intent to pick image from camera
-        ContentValues cv = new ContentValues();
-        cv.put(MediaStore.Images.Media.TITLE,"Temp Pick");
-        cv.put(MediaStore.Images.Media.DESCRIPTION,"Temp Descr");
-        image_uri = getActivity().getApplicationContext().getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, cv);
-        Intent intent  = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        Intent intent1 = intent.putExtra(MediaStore.EXTRA_OUTPUT, image_uri);
-        startActivityForResult(intent,IMAGE_PICK_CAMERA_CODE);
-    }
-    private boolean checkStoragePermission()
-    {
-        // check if storage permission is enabled or not
-        // return true if enabled
-        // return false if not enabled
-        boolean result = ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE) ==
-                (PackageManager.PERMISSION_GRANTED);
-        return result;
-    }
-    private void requestStoragePermission()
-    {
-        // request runtime storage permission
-        //ActivityCompat.requestPermissions(getActivity(), storagePermission, STORAGE_REQUEST_CODE);
-        requestPermissions(storagePermission,STORAGE_REQUEST_CODE);
-    }
-    private boolean checkCameraPermission()
-    {
-        // check if camera permission is enabled or not
-        // return true if enabled
-        // return false if not enabled
-        boolean result = ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.CAMERA) ==
-                (PackageManager.PERMISSION_GRANTED);
-        boolean result1 = ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE) ==
-                (PackageManager.PERMISSION_GRANTED);
-        return result && result1;
-    }
-    private void requestCameraPermission()
-    {
-        // request runtime camera permission
-        // ActivityCompat.requestPermissions(getActivity(),cameraPermission,CAMERA_REQUEST_CODE);
-        requestPermissions(cameraPermission, CAMERA_REQUEST_CODE);
-    }
-    // handle permission result
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        switch (requestCode) {
-            case CAMERA_REQUEST_CODE:{
-                if(grantResults.length > 0) {
-                    boolean cameraAccepted = grantResults[0] == PackageManager.PERMISSION_GRANTED;
-                    boolean storageAccepted = grantResults[1] == PackageManager.PERMISSION_GRANTED;
-                    if (cameraAccepted && storageAccepted) {
-                        pickFromCamera();
-                    }
-                    else {
-                        Toast.makeText(getActivity(), "Camera & Storage both permissions are necessary....", Toast.LENGTH_SHORT).show();
-                    }
-                }
-                else{ }
-            }
-            break;
-            case STORAGE_REQUEST_CODE:{
-                if (grantResults.length > 0) {
-                    boolean storageAccept = grantResults[0] ==  PackageManager.PERMISSION_GRANTED;
-                    if(storageAccept) {
-                        pickFromGallery();
-                    }
-                    else {
-                        Toast.makeText(getActivity(), "Storage permission necessary...", Toast.LENGTH_SHORT).show();
-                    }
-                }
-                else { }
-            }
-            break;
-        }
-    }
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        if(requestCode == RESULT_OK) {
-            if (requestCode == IMAGE_PICK_GALLERY_CODE) {
-                // image picked from gallery, get uri of image
-                image_uri = data.getData();
-                // use this image uri to upload to firebase storage
-                try {
-                    sendImageMessage(image_uri);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-            else if (requestCode == IMAGE_PICK_CAMERA_CODE) {
-                // image picked from camera, get uri of image
-                try {
-                    sendImageMessage(image_uri);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
 
-            }
-            super.onActivityResult(requestCode,resultCode,data);
-        }
+    private void pickFromGallery() {
+        Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        activityResultLauncherGallery.launch(intent);
     }
 
-    private void sendImageMessage(Uri image_uri) throws IOException {
-        notify = true;
-        // progress dialog
-        ProgressDialog progressDialog = new ProgressDialog(getActivity());
-        progressDialog.setMessage("Sending image.....");
-        progressDialog.show();
-        String timeStamp = ""+System.currentTimeMillis();
-        String fileNameAndPath = "ChatImages/"+"post_" + System.currentTimeMillis();
-        /* chat node will be created that will contain all images sent via chat */
+    private void pickFromCamera() {
+        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        activityResultLauncher.launch(takePictureIntent);
+    }
 
-        // get bitmap from image uri
-        Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContext().getContentResolver(), image_uri);
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.PNG, 100,baos);
-        byte[] data = baos.toByteArray(); // convert image to bytes
-        StorageReference ref = FirebaseStorage.getInstance().getReference().child(fileNameAndPath);
-        ref.putBytes(data)
-                .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    private void sendImageMessage(Object o) throws IOException {
+
+        DatabaseReference reference = database.getReference().child("users").child(auth.getUid());
+        String message = o.toString();
+        Date date = new Date();
+        Message message1 = new Message(message, userSend.getUid(), date.getTime(), true);
+        database = FirebaseDatabase.getInstance();
+        database.getReference().child("chats")
+                .child(senderRoom)
+                .child("messages")
+                .push()
+                .setValue(message1).addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
-                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                        //  image upload
-                        progressDialog.dismiss();
-                        // get uri of uploaded image
-                        Task<Uri> uriTask = taskSnapshot.getStorage().getDownloadUrl();
-                        while(!uriTask.isSuccessful());
-                        String downloadUri = uriTask.getResult().toString();
-                        if(uriTask.isSuccessful()) {
-                            // add image uri and other info to database
-                            DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference();
-                            // setup required data
-                            HashMap<String, Object> hashMap = new HashMap<>();
-                            hashMap.put("sender",senderRoom);
-                            hashMap.put("receiver",receiverRoom);
-                            hashMap.put("message",downloadUri);
-                            hashMap.put("timestamp",timeStamp);
-                            hashMap.put("type","image");
-                            hashMap.put("isSeen",false);
-                            // put this data to firebase
-                            databaseReference.child("Chats").push().setValue(hashMap);
-                            // send notification
-//                            DatabaseReference database = FirebaseDatabase.getInstance().getReference("Users").child(myUid);
-//                            database.addValueEventListener(new ValueEventListener() {
-//                                @Override
-//                                public void onDataChange(@NonNull DataSnapshot snapshot) {
-//                                    User user = snapshot.getValue(User.class);
-//                                    if(notify){
-//                                        //sendNotification(hisUid,user.getName(),"Sent you a photo...");
-//                                    }
-//                                    notify = false;
-//                                }
-//
-//                                @Override
-//                                public void onCancelled(@NonNull DatabaseError error) {
-//
-//                                }
-//                            });
-                        }
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        // image failed
-                        progressDialog.dismiss();
+                    public void onComplete(@NonNull Task<Void> task) {
+                        database.getReference().child("chats")
+                                .child(receiverRoom)
+                                .child("messages")
+                                .push()
+                                .setValue(message1).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<Void> task) {
+
+                                    }
+                                });
                     }
                 });
+
+        // set recentActivity for user
+        LocalDateTime now = LocalDateTime.now();
+        ZonedDateTime zdt = now.atZone(ZoneId.of("America/Los_Angeles"));
+        long millis = zdt.toInstant().toEpochMilli();
+        reference.child("recentActivity").setValue(millis);
+        DatabaseReference referenceReceive = database.getReference().child("users").child(userReceive.getUid());
+        referenceReceive.child("recentActivity").setValue(millis);
+
     }
+
 
 }

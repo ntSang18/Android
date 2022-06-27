@@ -12,9 +12,9 @@ import androidx.annotation.NonNull;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.example.chatapp.Model.User;
 import com.example.chatapp.R;
-import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
@@ -23,10 +23,12 @@ import de.hdodenhof.circleimageview.CircleImageView;
 public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
 
     private List<User> listUserOnline;
+    private Context context;
 
 
-    public UserAdapter(List<User> listUserOnline) {
+    public UserAdapter(List<User> listUserOnline, Context context) {
         this.listUserOnline = listUserOnline;
+        this.context = context;
     }
 
     @NonNull
@@ -45,7 +47,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
             return;
         }
         holder.userName.setText(user.getName());
-        Picasso.get().load(user.getImageUri()).into(holder.userImage);
+        Glide.with(context).load(user.getImageUri()).into(holder.userImage);
 
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override

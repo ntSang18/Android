@@ -16,6 +16,7 @@ import android.view.ViewGroup;
 import android.widget.SearchView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.example.chatapp.Model.User;
 import com.example.chatapp.ViewModel.UserAdapter;
 import com.example.chatapp.ViewModel.UserChatAdapter;
@@ -26,7 +27,6 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -64,7 +64,7 @@ public class HomeFragment extends HandlerUser {
         // TSang: Get list user
         userList = new ArrayList<>();
         userListChat = new ArrayList<>();
-        userAdapter = new UserAdapter(userList);
+        userAdapter = new UserAdapter(userList, getContext());
         userAdapterChat = new UserChatAdapter(userListChat, getContext());
         binding.onlines.setAdapter(userAdapter);
         binding.chats.setAdapter(userAdapterChat);
@@ -82,7 +82,7 @@ public class HomeFragment extends HandlerUser {
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
                     user.setName(snapshot.child("name").getValue().toString());
                     user.setImageUri(snapshot.child("imageUri").getValue().toString());
-                    Picasso.get().load(snapshot.child("imageUri").getValue().toString()).into(binding.imgView);
+                    Glide.with(getContext()).load(snapshot.child("imageUri").getValue().toString()).into(binding.imgView);
                 }
 
                 @Override
@@ -171,6 +171,7 @@ public class HomeFragment extends HandlerUser {
             }
         };
         requireActivity().getOnBackPressedDispatcher().addCallback(getActivity(), callback);
+
 
         return root;
     }
